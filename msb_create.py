@@ -26,7 +26,6 @@ from dotenv import load_dotenv
 
 from converter import convert_to_tg_sticker, extract_zip, guess_format, init_convert, ls_files_r
 from line_downloader import LineDownloadError, LineUnsupportedTypeError, download_zip, fetch_line_info
-from tg_api import add_stickers_to_set, create_sticker_set, ensure_connected, make_client
 
 load_dotenv()
 
@@ -80,6 +79,7 @@ def generate_set_name(title: str) -> str:
 
 
 async def _test_connection(api_id: int, api_hash: str, phone: str) -> None:
+    from tg_api import ensure_connected, make_client
     async with make_client(api_id, api_hash) as client:
         await ensure_connected(client, phone=phone)
         me = await client.get_me()
@@ -151,6 +151,7 @@ async def run(args: argparse.Namespace, api_id: int, api_hash: str, phone: str) 
         logging.info("Sticker set name : %s", set_name)
         logging.info("Sticker set title: %s", args.title)
 
+        from tg_api import add_stickers_to_set, create_sticker_set, ensure_connected, make_client
         async with make_client(api_id, api_hash) as client:
             await ensure_connected(client, phone=phone)
 
@@ -181,7 +182,7 @@ async def run(args: argparse.Namespace, api_id: int, api_hash: str, phone: str) 
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
-def main() -> None:
+def _make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Create a Telegram sticker set from local image files or a LINE store URL."
     )
@@ -203,6 +204,11 @@ def main() -> None:
     parser.add_argument("--log_level", default="INFO",
                         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
                         help="Logging verbosity (default: INFO)")
+    return parser
+
+
+def main() -> None:
+    parser = _make_parser()
     args = parser.parse_args()
 
     if args.input and not args.title:
