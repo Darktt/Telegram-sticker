@@ -1,5 +1,6 @@
-# msb_create — 本地貼圖建立工具
+# Telegram-sticker — 本地貼圖建立工具
 
+因應 moe-sticker-bot 失效後建立的 Telegram 貼圖工具,
 從本地圖片檔案直接建立 Telegram 貼圖集，無需透過 Bot 的對話流程。
 使用 Telegram 用戶端 API（MTProto）以你的帳號身份操作，不需要 Bot Token。
 
