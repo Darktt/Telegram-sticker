@@ -1,0 +1,5 @@
+.env
+*.session
+.venv/
+stickers/
+.DS_Store

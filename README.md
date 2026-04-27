@@ -5,24 +5,25 @@
 
 ## 安裝
 
-不論平台，均執行同一個指令：
+### 自動安裝（推薦）
+
+不論平台，均在專案根目錄執行：
 
 ```bash
-cd python
 bash setup.sh
 ```
 
 `setup.sh` 會自動偵測作業系統：
 
-- **macOS** — 直接在本檔執行，透過 Homebrew 安裝系統套件
+- **macOS** — 透過 Homebrew 安裝系統套件
 - **Linux** — 自動移交給 `setup_linux.sh` 執行（支援 apt / dnf / yum）
 - **其他平台** — 印出警告，請手動安裝系統套件後繼續
 
-兩個腳本共同完成以下步驟：
+腳本完成以下步驟：
 
 1. 安裝缺少的系統相依套件
 2. 確認 Python 版本（需 3.9+）
-3. 在 `python/.venv` 建立虛擬環境
+3. 在 `.venv` 建立虛擬環境
 4. 安裝 `requirements.txt` 中的所有 Python 套件
 5. 若 `.env` 不存在，從 `.env.example` 複製一份
 
@@ -31,6 +32,33 @@ bash setup.sh
 ```bash
 bash setup_linux.sh
 ```
+
+### 手動建立虛擬環境
+
+若不使用安裝腳本，可自行建立：
+
+```bash
+# 建立虛擬環境（需 Python 3.9+）
+python3 -m venv .venv
+
+# 啟動虛擬環境
+source .venv/bin/activate        # macOS / Linux
+.venv\Scripts\activate           # Windows
+
+# 安裝相依套件
+pip install -r requirements.txt
+```
+
+### 啟動虛擬環境
+
+每次開啟新的終端機視窗後，執行指令前都需要先啟動：
+
+```bash
+source .venv/bin/activate        # macOS / Linux
+.venv\Scripts\activate           # Windows
+```
+
+啟動後提示字元會出現 `(.venv)` 前綴，表示已進入虛擬環境。
 
 ### 系統相依套件
 
@@ -91,20 +119,22 @@ Please enter the code you received: 12345
 ## 使用方式
 
 ```
-python msb_create.py -i INPUT -n TITLE [OPTIONS]
+python msb_create.py (-i INPUT | --line LINE_URL | --test) [OPTIONS]
 ```
 
-### 必填參數
+輸入來源三選一（互斥）：
 
 | 參數 | 說明 |
 |------|------|
-| `-i`, `--input` | 輸入來源：圖片目錄、單一圖片檔案、或 ZIP 壓縮包 |
-| `-n`, `--title` | 貼圖集標題（1–64 字符） |
+| `-i`, `--input` | 本地輸入：圖片目錄、單一圖片檔案、或 ZIP 壓縮包（需搭配 `-n`） |
+| `--line LINE_URL` | LINE 貼圖商店網址，自動下載並轉換（`-n` 可省略，自動取得標題） |
+| `--test` | 測試 Telegram API 連線，印出登入帳號資訊後結束 |
 
 ### 選填參數
 
 | 參數 | 預設值 | 說明 |
 |------|--------|------|
+| `-n`, `--title` | — | 貼圖集標題（1–64 字符；使用 `-i` 時必填） |
 | `-s`, `--name` | 自動產生 | 貼圖集短名稱（必須符合 `[a-zA-Z0-9_]`，全域唯一） |
 | `-e`, `--emoji` | `⭐` | 所有貼圖使用的預設 emoji |
 | `--custom_emoji` | — | 建立 Custom Emoji 貼圖集（圖片縮放至 100×100） |
@@ -115,7 +145,16 @@ python msb_create.py -i INPUT -n TITLE [OPTIONS]
 ## 範例
 
 ```bash
-# 從目錄建立一般貼圖集
+# 確認 Telegram API 連線是否正常
+python msb_create.py --test
+
+# 從 LINE 貼圖商店直接下載並建立（標題自動取得）
+python msb_create.py --line "https://store.line.me/stickershop/product/12345"
+
+# 從 LINE 商店下載，手動指定標題
+python msb_create.py --line "https://store.line.me/stickershop/product/12345" -n "我的貼圖集"
+
+# 從本地目錄建立一般貼圖集
 python msb_create.py -i ./my_stickers/ -n "My Sticker Pack"
 
 # 從 ZIP 壓縮包建立
@@ -150,8 +189,10 @@ python msb_create.py \
 | `msb_create.py` | CLI 入口，負責參數解析與整體流程 |
 | `converter.py` | 圖片/影片轉換，對應專案的 `pkg/msbimport/convert.go` |
 | `tg_api.py` | Telegram MTProto API 封裝（Telethon）|
-| `requirements.txt` | Python 依賴（`telethon`、`python-dotenv`） |
+| `line_downloader.py` | LINE 貼圖商店頁面解析與 ZIP 下載（供 `--line` 使用）|
+| `requirements.txt` | Python 依賴（`telethon`、`python-dotenv`、`requests`、`beautifulsoup4`）|
 | `setup.sh` | 安裝腳本（macOS / 通用入口），Linux 自動移交給 `setup_linux.sh` |
 | `setup_linux.sh` | Linux 專用安裝腳本（apt / dnf / yum），可單獨執行 |
 | `.env.example` | 環境變數範本，複製為 `.env` 後填入實際值 |
 | `msb_create.session` | Telethon 登入 session（首次登入後自動產生，勿分享）|
+| `tools/line_dlink.sh` | 手動查詢 LINE 貼圖下載連結的 Shell 腳本 |
