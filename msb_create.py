@@ -12,6 +12,7 @@ Usage:
 """
 
 import argparse
+from ast import arg
 import asyncio
 import logging
 import os
@@ -193,6 +194,8 @@ def _make_parser() -> argparse.ArgumentParser:
                            help="LINE store URL (e.g. https://store.line.me/stickershop/product/12345)")
     src_group.add_argument("--test", action="store_true",
                            help="Test Telegram API connection and print account info")
+    src_group.add_argument("--clean", action="store_true",
+                           help="Clean sticker folder.")
     parser.add_argument("-n", "--title", default=None,
                         help="Sticker set title (1-64 characters; auto-detected when using --line)")
     parser.add_argument("-s", "--name",
@@ -218,6 +221,16 @@ def main() -> None:
         level=getattr(logging, args.log_level),
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
+
+    if args.clean:
+        sticker_dir = Path(__file__).parent / "stickers"
+
+        if sticker_dir.exists() and sticker_dir.is_dir():
+            logging.info("Cleaning %s ...", str(sticker_dir))
+            shutil.rmtree(sticker_dir, ignore_errors=True)
+            logging.info("Done.")
+
+        sys.exit(1)
 
     api_id_str = os.environ.get("API_ID")
     api_hash = os.environ.get("API_HASH")
