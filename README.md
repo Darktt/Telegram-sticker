@@ -79,7 +79,13 @@ source .venv/bin/activate        # macOS / Linux
 
 1. 前往 [my.telegram.org](https://my.telegram.org) 並登入
 2. 點選 **API development tools**
-3. 建立應用程式後取得 `API_ID` 和 `API_HASH`
+3. 填寫表單
+   * App title: sticker-convert
+   * Short name: sticker-convert
+   * URL: www.telegram.org
+   * Platform: Desktop
+   * Description: sticker-convert
+4. 建立應用程式後取得 `API_ID` 和 `API_HASH`
 
 ### 建立 .env 檔案
 
@@ -130,6 +136,7 @@ python msb_create.py (-i INPUT | --line LINE_URL | --test) [OPTIONS]
 | `-i`, `--input` | 本地輸入：圖片目錄、單一圖片檔案、或 ZIP 壓縮包（需搭配 `-n`） |
 | `--line LINE_URL` | LINE 貼圖商店網址，自動下載並轉換（`-n` 可省略，自動取得標題） |
 | `--test` | 測試 Telegram API 連線，印出登入帳號資訊後結束 |
+| `--clean` | 清理下載下來的貼圖檔案 |
 
 ### 選填參數
 
