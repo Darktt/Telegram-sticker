@@ -1,8 +1,21 @@
 # Telegram-sticker — 本地貼圖建立工具
 
 因應 moe-sticker-bot 失效後建立的 Telegram 貼圖工具,
-從本地圖片檔案直接建立 Telegram 貼圖集，無需透過 Bot 的對話流程。
-使用 Telegram 用戶端 API（MTProto）以你的帳號身份操作，不需要 Bot Token。
+直接從本地圖片檔案直接建立 Telegram 貼圖集，無需透過 Bot 的對話流程。
+
+使用 Telegram 用戶端 API（MTProto）以你的帳號身份操作。
+
+## 前言
+給不想那麼麻煩的人，可以使用 `tools/line_dlink.sh` 工具取得 Line 貼圖的下載連結，然後使用 [sticker-convert](https://github.com/laggykiller/sticker-convert) 自行手動上傳。
+
+``` bash
+> cd tools
+> chmod +x line_dlink.sh
+> ./line_dlink.sh "{ Line 貼圖網址 }"
+# ./line_dlink.sh "https://store.line.me/stickershop/product/12345"
+```
+
+* Windows 的使用者需要安裝 WSL：[如何使用 WSL 在 Windows 上安裝 Linux](https://learn.microsoft.com/zh-tw/windows/wsl/install)
 
 ## 安裝
 
