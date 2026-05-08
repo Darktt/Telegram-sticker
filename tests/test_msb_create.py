@@ -3,6 +3,7 @@ import pytest
 from msb_create import (
     ALREADY_CONVERTED_EXTS,
     SUPPORTED_EXTS,
+    _is_animation_file,
     _is_wanted,
     _make_parser,
     collect_input_files,
@@ -10,6 +11,27 @@ from msb_create import (
 )
 
 ALL_EXTS = SUPPORTED_EXTS | ALREADY_CONVERTED_EXTS
+
+
+# ---------------------------------------------------------------------------
+# _is_animation_file
+# ---------------------------------------------------------------------------
+
+class TestIsAnimationFile:
+    def test_animation_folder_detected(self):
+        assert _is_animation_file("/stickers/12345/animation@2x/001.png") is True
+
+    def test_windows_path_detected(self):
+        assert _is_animation_file("stickers\\12345\\animation@2x\\001.png") is True
+
+    def test_static_file_not_detected(self):
+        assert _is_animation_file("/stickers/12345/001.png") is False
+
+    def test_unrelated_path_not_detected(self):
+        assert _is_animation_file("/images/animation/sticker.png") is False
+
+    def test_exact_folder_name_required(self):
+        assert _is_animation_file("/stickers/12345/animation@3x/001.png") is False
 
 
 # ---------------------------------------------------------------------------

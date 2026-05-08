@@ -37,6 +37,15 @@ def init_convert():
 
 
 def identify_frames(f: str) -> int:
+    # ImageMagick identify does not parse APNG; detect via the acTL chunk
+    if f.lower().endswith(".png"):
+        try:
+            with open(f, "rb") as fp:
+                if b"acTL" in fp.read():
+                    return 2
+        except OSError:
+            pass
+
     try:
         args = [IDENTIFY_BIN] + IDENTIFY_ARGS + ["-format", "%n", f]
         result = subprocess.run(args, capture_output=True, text=True, timeout=30)
@@ -112,9 +121,16 @@ def ff_to_webm_video(f: str, is_emoji: bool = False) -> str:
     return output
 
 
-def convert_to_tg_sticker(f: str, is_emoji: bool = False) -> tuple[str, str]:
+def ff_to_webp_animated(f: str, is_emoji: bool = False) -> str:
+    return ff_to_webm_video(f, is_emoji)
+
+
+def convert_to_tg_sticker(f: str, is_emoji: bool = False, animated_webp: bool = False) -> tuple[str, str]:
     frames = identify_frames(f)
     if frames > 1:
+        if animated_webp:
+            converted = ff_to_webp_animated(f, is_emoji)
+            return converted, "video"
         converted = ff_to_webm_video(f, is_emoji)
         return converted, "video"
     else:

@@ -32,7 +32,7 @@ async def ensure_connected(client: TelegramClient, phone: Optional[str] = None) 
 
 
 async def upload_sticker_document(client: TelegramClient, file_path: str, fmt: str) -> InputDocument:
-    mime = "image/webp" if fmt == "static" else "video/webm"
+    mime = "video/webm" if fmt == "video" else "image/webp"
     fname = os.path.basename(file_path)
 
     logger.debug("Uploading %s ...", fname)

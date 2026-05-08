@@ -38,6 +38,9 @@ BATCH_LIMIT = 120  # Telegram MTProto sticker set limit
 EXCLUDE_NAME_PATTERNS = {"_key@2x", "_key@3x", "tab_off", "tab_on"}
 
 
+def _is_animation_file(path: str) -> bool:
+    return "animation@2x" in path.replace("\\", "/")
+
 def _is_wanted(path: str, all_exts: set) -> bool:
     p = Path(path)
     if p.suffix.lower() not in all_exts:
@@ -128,7 +131,15 @@ async def run(args: argparse.Namespace, api_id: int, api_hash: str, phone: str) 
         if not input_files:
             logging.error("No supported image files found in: %s", args.input)
             sys.exit(1)
-        logging.info("Found %d input file(s).", len(input_files))
+
+        # If animation@2x files exist, use only those — the root-dir files are
+        # static previews of the same stickers and must not be mixed in.
+        animation_files = [f for f in input_files if _is_animation_file(f)]
+        if animation_files:
+            input_files = animation_files
+            logging.info("Animated pack: using %d animation@2x file(s).", len(input_files))
+        else:
+            logging.info("Found %d input file(s).", len(input_files))
 
         converted: list[tuple[str, str]] = []
         for f in input_files:
@@ -139,7 +150,8 @@ async def run(args: argparse.Namespace, api_id: int, api_hash: str, phone: str) 
             else:
                 logging.info("Converting: %s", f)
                 try:
-                    path, fmt = convert_to_tg_sticker(f, args.custom_emoji)
+                    use_animated_webp = _is_animation_file(f)
+                    path, fmt = convert_to_tg_sticker(f, args.custom_emoji, animated_webp=use_animated_webp)
                     converted.append((path, fmt))
                 except Exception as exc:
                     logging.error("Conversion failed for %s: %s", f, exc)
