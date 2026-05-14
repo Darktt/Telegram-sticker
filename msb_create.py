@@ -141,6 +141,9 @@ async def run(args: argparse.Namespace, api_id: int, api_hash: str, phone: str) 
         else:
             logging.info("Found %d input file(s).", len(input_files))
 
+        converted_dir = os.path.join(tmp_dir, "converted")
+        os.makedirs(converted_dir, exist_ok=True)
+
         converted: list[tuple[str, str]] = []
         for f in input_files:
             suffix = Path(f).suffix.lower()
@@ -151,7 +154,7 @@ async def run(args: argparse.Namespace, api_id: int, api_hash: str, phone: str) 
                 logging.info("Converting: %s", f)
                 try:
                     use_animated_webp = _is_animation_file(f)
-                    path, fmt = convert_to_tg_sticker(f, args.custom_emoji, animated_webp=use_animated_webp)
+                    path, fmt = convert_to_tg_sticker(f, args.custom_emoji, animated_webp=use_animated_webp, out_dir=converted_dir)
                     converted.append((path, fmt))
                 except Exception as exc:
                     logging.error("Conversion failed for %s: %s", f, exc)
@@ -242,7 +245,7 @@ def main() -> None:
             shutil.rmtree(sticker_dir, ignore_errors=True)
             logging.info("Done.")
 
-        sys.exit(1)
+        sys.exit(0)
 
     api_id_str = os.environ.get("API_ID")
     api_hash = os.environ.get("API_HASH")

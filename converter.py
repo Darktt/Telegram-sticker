@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import os
 import platform
 import shutil
@@ -56,8 +57,12 @@ def identify_frames(f: str) -> int:
         return 1
 
 
-def im_to_webp_static(f: str, is_emoji: bool = False) -> str:
-    output = f + ".webp"
+def im_to_webp_static(f: str, is_emoji: bool = False, out_dir: Optional[str] = None) -> str:
+    if out_dir:
+        digest = hashlib.md5(f.encode()).hexdigest()[:8]
+        output = os.path.join(out_dir, f"{digest}_{os.path.basename(f)}.webp")
+    else:
+        output = f + ".webp"
 
     if is_emoji:
         scale_args = [
@@ -89,8 +94,12 @@ def im_to_webp_static(f: str, is_emoji: bool = False) -> str:
     return output
 
 
-def ff_to_webm_video(f: str, is_emoji: bool = False) -> str:
-    output = f + ".webm"
+def ff_to_webm_video(f: str, is_emoji: bool = False, out_dir: Optional[str] = None) -> str:
+    if out_dir:
+        digest = hashlib.md5(f.encode()).hexdigest()[:8]
+        output = os.path.join(out_dir, f"{digest}_{os.path.basename(f)}.webm")
+    else:
+        output = f + ".webm"
     scale = "100:100" if is_emoji else "512:512"
     scale_filter = f"scale={scale}:force_original_aspect_ratio=decrease"
 
@@ -121,20 +130,20 @@ def ff_to_webm_video(f: str, is_emoji: bool = False) -> str:
     return output
 
 
-def ff_to_webp_animated(f: str, is_emoji: bool = False) -> str:
-    return ff_to_webm_video(f, is_emoji)
+def ff_to_webp_animated(f: str, is_emoji: bool = False, out_dir: Optional[str] = None) -> str:
+    return ff_to_webm_video(f, is_emoji, out_dir)
 
 
-def convert_to_tg_sticker(f: str, is_emoji: bool = False, animated_webp: bool = False) -> tuple[str, str]:
+def convert_to_tg_sticker(f: str, is_emoji: bool = False, animated_webp: bool = False, out_dir: Optional[str] = None) -> tuple[str, str]:
     frames = identify_frames(f)
     if frames > 1:
         if animated_webp:
-            converted = ff_to_webp_animated(f, is_emoji)
+            converted = ff_to_webp_animated(f, is_emoji, out_dir)
             return converted, "video"
-        converted = ff_to_webm_video(f, is_emoji)
+        converted = ff_to_webm_video(f, is_emoji, out_dir)
         return converted, "video"
     else:
-        converted = im_to_webp_static(f, is_emoji)
+        converted = im_to_webp_static(f, is_emoji, out_dir)
         return converted, "static"
 
 
