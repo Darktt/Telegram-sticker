@@ -35,7 +35,7 @@ ALREADY_CONVERTED_EXTS = {".webp", ".webm"}
 BATCH_LIMIT = 120  # Telegram MTProto sticker set limit
 
 # Substrings to exclude from filenames (e.g. LINE key/thumbnail images)
-EXCLUDE_NAME_PATTERNS = {"_key@2x", "_key@3x", "tab_off", "tab_on"}
+EXCLUDE_NAME_PATTERNS = {"_key", "_key@2x", "_key@3x", "tab_off", "tab_on"}
 
 
 def _is_animation_file(path: str) -> bool:
