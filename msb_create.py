@@ -112,6 +112,9 @@ async def run(args: argparse.Namespace, api_id: int, api_hash: str, phone: str) 
                 sys.exit(1)
 
             if not args.title:
+                if not pack_info.title:
+                    logging.error("Could not determine sticker pack title; please specify -n")
+                    sys.exit(1)
                 args.title = pack_info.title
                 logging.info("Auto-detected title: %s", args.title)
 

@@ -154,11 +154,12 @@ class TestFetchLineInfo:
         with pytest.raises(LineUnsupportedTypeError):
             fetch_line_info("https://store.line.me/stickershop/product/123")
 
-    def test_empty_title_raises(self, mocker):
+    def test_empty_title_returns_empty(self, mocker):
         html = _stickershop_html("123", "")
         mocker.patch("line_downloader.requests.get", return_value=_mock_response(html))
-        with pytest.raises(LineDownloadError):
-            fetch_line_info("https://store.line.me/stickershop/product/123")
+        info = fetch_line_info("https://store.line.me/stickershop/product/123")
+        assert isinstance(info, LinePackInfo)
+        assert info.title == ""
 
     def test_no_id_url_raises(self, mocker):
         mocker.patch(

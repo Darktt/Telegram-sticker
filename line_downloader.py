@@ -140,11 +140,6 @@ def fetch_line_info(url: str) -> LinePackInfo:
     else:
         raise LineDownloadError(f"unknown LINE store category (URL: {store_url})")
 
-    if not title:
-        raise LineDownloadError(
-            "could not determine sticker pack title; please specify -n"
-        )
-
     logging.info("LINE pack: %r  category=%s  id=%s", title, category, pack_id)
     return LinePackInfo(
         id=pack_id,
